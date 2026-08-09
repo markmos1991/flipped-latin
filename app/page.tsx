@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { DisplayMode } from "@/types/arabic";
+import { DisplayMode, WordPair } from "@/types/arabic";
 import { sampleSentences } from "@/lib/data/sample";
 import { stripHarakat } from "@/lib/arabic/harakat";
 import FlippedText from "@/components/FlippedText";
 import DisplayControls from "@/components/DisplayControls";
+import ArabicInput from "@/components/ArabicInput";
 
 const STORAGE_KEY = "flipped-latin-settings";
 
@@ -34,6 +35,7 @@ const DEFAULTS: Settings = {
 export default function Home() {
   const [settings, setSettings] = useState<Settings>(DEFAULTS);
   const [showEnglish, setShowEnglish] = useState(false);
+  const [customWords, setCustomWords] = useState<WordPair[] | null>(null);
   // Prevents the save effect from overwriting localStorage with DEFAULTS
   // on the first render, before the load effect has run.
   const firstSave = useRef(true);
@@ -58,9 +60,12 @@ export default function Home() {
   const sentence =
     sampleSentences.find((s) => s.id === sentenceId) ?? sampleSentences[0];
 
+  const activeWords = customWords ?? sentence.words;
+
   function selectSentence(id: string) {
     setSettings((s) => ({ ...s, sentenceId: id }));
     setShowEnglish(false);
+    setCustomWords(null);
   }
 
   return (
@@ -76,7 +81,7 @@ export default function Home() {
 
       <section className="mb-8 rounded-xl border border-ink-line bg-ink-soft/60 px-5 py-10 sm:px-8">
         <FlippedText
-          words={sentence.words}
+          words={activeWords}
           mode={mode}
           arabicSize={arabicSize}
           latinSize={latinSize}
@@ -86,7 +91,7 @@ export default function Home() {
           showHarakat={showHarakat}
         />
 
-        {sentence.english && (
+        {!customWords && sentence.english && (
           <div className="mt-8 flex justify-end">
             <button
               onClick={() => setShowEnglish((v) => !v)}
@@ -113,6 +118,10 @@ export default function Home() {
             {showHarakat ? s.arabic : stripHarakat(s.arabic)}
           </button>
         ))}
+      </div>
+
+      <div className="mb-8 rounded-lg border border-ink-line bg-ink-soft p-4 sm:p-5">
+        <ArabicInput onSubmit={(words) => { setCustomWords(words); setShowEnglish(false); }} />
       </div>
 
       <DisplayControls
