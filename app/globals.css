@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  background-color: #13100d;
+  color: #f3ecdd;
+}
+
+body {
+  min-height: 100dvh;
+}
+
+/* Custom range slider styling so the experiment controls feel
+   considered rather than default OS chrome. */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 2px;
+  background: #2a2420;
+  border-radius: 999px;
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: #c9a227;
+  cursor: pointer;
+  margin-top: -5px;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: none;
+  border-radius: 999px;
+  background: #c9a227;
+  cursor: pointer;
+}
+
+::selection {
+  background: rgba(201, 162, 39, 0.3);
+}
