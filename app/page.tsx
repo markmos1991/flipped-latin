@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { DisplayMode } from "@/types/arabic";
 import { sampleSentences } from "@/lib/data/sample";
+import { stripHarakat } from "@/lib/arabic/harakat";
 import FlippedText from "@/components/FlippedText";
 import DisplayControls from "@/components/DisplayControls";
 
@@ -16,6 +17,7 @@ type Settings = {
   wordGap: number;
   latinGap: number;
   showAxis: boolean;
+  showHarakat: boolean;
 };
 
 const DEFAULTS: Settings = {
@@ -26,6 +28,7 @@ const DEFAULTS: Settings = {
   wordGap: 20,
   latinGap: 6,
   showAxis: false,
+  showHarakat: true,
 };
 
 export default function Home() {
@@ -49,7 +52,7 @@ export default function Home() {
     } catch {}
   }, [settings]);
 
-  const { sentenceId, mode, arabicSize, latinSize, wordGap, latinGap, showAxis } =
+  const { sentenceId, mode, arabicSize, latinSize, wordGap, latinGap, showAxis, showHarakat } =
     settings;
 
   const sentence =
@@ -80,6 +83,7 @@ export default function Home() {
           wordGap={wordGap}
           latinGap={latinGap}
           showAxis={showAxis}
+          showHarakat={showHarakat}
         />
 
         {sentence.english && (
@@ -106,7 +110,7 @@ export default function Home() {
                 : "border-ink-line text-paper-dim hover:border-gold/50 hover:text-paper",
             ].join(" ")}
           >
-            {s.arabic}
+            {showHarakat ? s.arabic : stripHarakat(s.arabic)}
           </button>
         ))}
       </div>
@@ -124,6 +128,8 @@ export default function Home() {
         onLatinGapChange={(latinGap) => setSettings((s) => ({ ...s, latinGap }))}
         showAxis={showAxis}
         onShowAxisChange={(showAxis) => setSettings((s) => ({ ...s, showAxis }))}
+        showHarakat={showHarakat}
+        onShowHarakatChange={(showHarakat) => setSettings((s) => ({ ...s, showHarakat }))}
       />
 
       <p className="mt-8 font-latin text-xs leading-relaxed text-paper-dim">

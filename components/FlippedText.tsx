@@ -11,6 +11,7 @@ type Props = {
   wordGap: number;
   latinGap: number;
   showAxis: boolean;
+  showHarakat: boolean;
 };
 
 export default function FlippedText({
@@ -21,6 +22,7 @@ export default function FlippedText({
   wordGap,
   latinGap,
   showAxis,
+  showHarakat,
 }: Props) {
   return (
     <div
@@ -37,6 +39,7 @@ export default function FlippedText({
           latinSize={latinSize}
           latinGap={latinGap}
           showAxis={showAxis}
+          showHarakat={showHarakat}
         />
       ))}
     </div>

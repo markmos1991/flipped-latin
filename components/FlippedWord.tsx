@@ -1,6 +1,7 @@
 "use client";
 
 import { WordPair, DisplayMode } from "@/types/arabic";
+import { stripHarakat } from "@/lib/arabic/harakat";
 
 type Props = {
   pair: WordPair;
@@ -9,6 +10,7 @@ type Props = {
   latinSize: number;
   latinGap: number;
   showAxis: boolean;
+  showHarakat: boolean;
 };
 
 export default function FlippedWord({
@@ -18,16 +20,18 @@ export default function FlippedWord({
   latinSize,
   latinGap,
   showAxis,
+  showHarakat,
 }: Props) {
   const showLatin = mode !== "arabic";
+  const arabicText = showHarakat ? pair.arabic : stripHarakat(pair.arabic);
 
   return (
     <div className="relative flex flex-col items-center">
       <span
         style={{ fontSize: `${arabicSize}px` }}
-        className="font-arabic leading-tight text-paper"
+        className="font-arabic leading-normal text-paper"
       >
-        {pair.arabic}
+        {arabicText}
       </span>
 
       {/*
