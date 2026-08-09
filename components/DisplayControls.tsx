@@ -15,6 +15,8 @@ type Props = {
   onLatinGapChange: (n: number) => void;
   showAxis: boolean;
   onShowAxisChange: (b: boolean) => void;
+  showHarakat: boolean;
+  onShowHarakatChange: (b: boolean) => void;
 };
 
 const MODES: { value: DisplayMode; label: string }[] = [
@@ -66,6 +68,8 @@ export default function DisplayControls({
   onLatinGapChange,
   showAxis,
   onShowAxisChange,
+  showHarakat,
+  onShowHarakatChange,
 }: Props) {
   return (
     <div className="rounded-lg border border-ink-line bg-ink-soft p-4 sm:p-5">
@@ -123,15 +127,26 @@ export default function DisplayControls({
         />
       </div>
 
-      <label className="mt-5 flex items-center gap-2 font-latin text-xs tracking-wide text-paper-dim">
-        <input
-          type="checkbox"
-          checked={showAxis}
-          onChange={(e) => onShowAxisChange(e.target.checked)}
-          className="h-3.5 w-3.5 accent-[#C9A227]"
-        />
-        Show mirror-axis mark
-      </label>
+      <div className="mt-5 flex flex-wrap gap-x-6 gap-y-3">
+        <label className="flex items-center gap-2 font-latin text-xs tracking-wide text-paper-dim">
+          <input
+            type="checkbox"
+            checked={showHarakat}
+            onChange={(e) => onShowHarakatChange(e.target.checked)}
+            className="h-3.5 w-3.5 accent-[#C9A227]"
+          />
+          Show harakat
+        </label>
+        <label className="flex items-center gap-2 font-latin text-xs tracking-wide text-paper-dim">
+          <input
+            type="checkbox"
+            checked={showAxis}
+            onChange={(e) => onShowAxisChange(e.target.checked)}
+            className="h-3.5 w-3.5 accent-[#C9A227]"
+          />
+          Show mirror-axis mark
+        </label>
+      </div>
     </div>
   );
 }

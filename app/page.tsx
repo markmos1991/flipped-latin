@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { DisplayMode } from "@/types/arabic";
+import { DisplayMode, WordPair } from "@/types/arabic";
 import { sampleSentences } from "@/lib/data/sample";
+import { stripHarakat } from "@/lib/arabic/harakat";
 import FlippedText from "@/components/FlippedText";
 import DisplayControls from "@/components/DisplayControls";
+import ArabicInput from "@/components/ArabicInput";
 
 const STORAGE_KEY = "flipped-latin-settings";
 
@@ -16,6 +18,7 @@ type Settings = {
   wordGap: number;
   latinGap: number;
   showAxis: boolean;
+  showHarakat: boolean;
 };
 
 const DEFAULTS: Settings = {
@@ -26,11 +29,13 @@ const DEFAULTS: Settings = {
   wordGap: 20,
   latinGap: 6,
   showAxis: false,
+  showHarakat: true,
 };
 
 export default function Home() {
   const [settings, setSettings] = useState<Settings>(DEFAULTS);
   const [showEnglish, setShowEnglish] = useState(false);
+  const [customWords, setCustomWords] = useState<WordPair[] | null>(null);
   // Prevents the save effect from overwriting localStorage with DEFAULTS
   // on the first render, before the load effect has run.
   const firstSave = useRef(true);
@@ -49,15 +54,27 @@ export default function Home() {
     } catch {}
   }, [settings]);
 
-  const { sentenceId, mode, arabicSize, latinSize, wordGap, latinGap, showAxis } =
+  const { sentenceId, mode, arabicSize, latinSize, wordGap, latinGap, showAxis, showHarakat } =
     settings;
 
   const sentence =
     sampleSentences.find((s) => s.id === sentenceId) ?? sampleSentences[0];
 
+  const activeWords = customWords ?? sentence.words;
+
+  function handleWordChange(index: number, latin: string) {
+    setCustomWords((prev) => {
+      const source = prev ?? sentence.words;
+      const next = [...source];
+      next[index] = { ...next[index], latin };
+      return next;
+    });
+  }
+
   function selectSentence(id: string) {
     setSettings((s) => ({ ...s, sentenceId: id }));
     setShowEnglish(false);
+    setCustomWords(null);
   }
 
   return (
@@ -73,16 +90,18 @@ export default function Home() {
 
       <section className="mb-8 rounded-xl border border-ink-line bg-ink-soft/60 px-5 py-10 sm:px-8">
         <FlippedText
-          words={sentence.words}
+          words={activeWords}
           mode={mode}
           arabicSize={arabicSize}
           latinSize={latinSize}
           wordGap={wordGap}
           latinGap={latinGap}
           showAxis={showAxis}
+          showHarakat={showHarakat}
+          onWordChange={handleWordChange}
         />
 
-        {sentence.english && (
+        {!customWords && sentence.english && (
           <div className="mt-8 flex justify-end">
             <button
               onClick={() => setShowEnglish((v) => !v)}
@@ -106,9 +125,13 @@ export default function Home() {
                 : "border-ink-line text-paper-dim hover:border-gold/50 hover:text-paper",
             ].join(" ")}
           >
-            {s.arabic}
+            {showHarakat ? s.arabic : stripHarakat(s.arabic)}
           </button>
         ))}
+      </div>
+
+      <div className="mb-8 rounded-lg border border-ink-line bg-ink-soft p-4 sm:p-5">
+        <ArabicInput onSubmit={(words) => { setCustomWords(words); setShowEnglish(false); }} />
       </div>
 
       <DisplayControls
@@ -124,6 +147,8 @@ export default function Home() {
         onLatinGapChange={(latinGap) => setSettings((s) => ({ ...s, latinGap }))}
         showAxis={showAxis}
         onShowAxisChange={(showAxis) => setSettings((s) => ({ ...s, showAxis }))}
+        showHarakat={showHarakat}
+        onShowHarakatChange={(showHarakat) => setSettings((s) => ({ ...s, showHarakat }))}
       />
 
       <p className="mt-8 font-latin text-xs leading-relaxed text-paper-dim">

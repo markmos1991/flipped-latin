@@ -11,6 +11,8 @@ type Props = {
   wordGap: number;
   latinGap: number;
   showAxis: boolean;
+  showHarakat: boolean;
+  onWordChange?: (index: number, latin: string) => void;
 };
 
 export default function FlippedText({
@@ -21,6 +23,8 @@ export default function FlippedText({
   wordGap,
   latinGap,
   showAxis,
+  showHarakat,
+  onWordChange,
 }: Props) {
   return (
     <div
@@ -37,6 +41,8 @@ export default function FlippedText({
           latinSize={latinSize}
           latinGap={latinGap}
           showAxis={showAxis}
+          showHarakat={showHarakat}
+          onLatinChange={onWordChange ? (latin) => onWordChange(i, latin) : undefined}
         />
       ))}
     </div>
