@@ -62,6 +62,15 @@ export default function Home() {
 
   const activeWords = customWords ?? sentence.words;
 
+  function handleWordChange(index: number, latin: string) {
+    setCustomWords((prev) => {
+      const source = prev ?? sentence.words;
+      const next = [...source];
+      next[index] = { ...next[index], latin };
+      return next;
+    });
+  }
+
   function selectSentence(id: string) {
     setSettings((s) => ({ ...s, sentenceId: id }));
     setShowEnglish(false);
@@ -89,6 +98,7 @@ export default function Home() {
           latinGap={latinGap}
           showAxis={showAxis}
           showHarakat={showHarakat}
+          onWordChange={handleWordChange}
         />
 
         {!customWords && sentence.english && (
