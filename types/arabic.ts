@@ -14,9 +14,16 @@ export type ArabicSentence = {
   words: WordPair[];
 };
 
-export type FlashCard = {
+// A single reviewable word — gloss included, unlike WordPair. Used by the
+// starter word list and flashcard storage; unrelated to ArabicSentence.
+export type WordEntry = {
+  arabic: string;
+  latin: string;
+  english: string;
+};
+
+export type FlashCard = WordEntry & {
   id: string;
-  sentence: ArabicSentence;
   createdAt: string;
 };
 
