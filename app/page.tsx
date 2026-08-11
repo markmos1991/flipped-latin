@@ -7,6 +7,8 @@ import { stripHarakat } from "@/lib/arabic/harakat";
 import FlippedText from "@/components/FlippedText";
 import DisplayControls from "@/components/DisplayControls";
 import ArabicInput from "@/components/ArabicInput";
+import FloatingSettingsButton from "@/components/FloatingSettingsButton";
+import SettingsSheet from "@/components/SettingsSheet";
 
 const STORAGE_KEY = "flipped-latin-settings";
 
@@ -32,19 +34,33 @@ const DEFAULTS: Settings = {
   showHarakat: true,
 };
 
+// Returns size/spacing defaults tuned to the viewport width.
+// Only applied on first visit — saved localStorage settings always win.
+function deviceDefaults(): Partial<Settings> {
+  const w = window.innerWidth;
+  if (w < 640)  return { arabicSize: 34, latinSize: 13, wordGap: 10, latinGap: 4 };
+  if (w < 1024) return { arabicSize: 44, latinSize: 16, wordGap: 16, latinGap: 5 };
+  return               { arabicSize: 52, latinSize: 20, wordGap: 24, latinGap: 6 };
+}
+
 export default function Home() {
   const [settings, setSettings] = useState<Settings>(DEFAULTS);
   const [showEnglish, setShowEnglish] = useState(false);
   const [customWords, setCustomWords] = useState<WordPair[] | null>(null);
-  // Prevents the save effect from overwriting localStorage with DEFAULTS
-  // on the first render, before the load effect has run.
+  const [sheetOpen, setSheetOpen] = useState(false);
   const firstSave = useRef(true);
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setSettings((prev) => ({ ...prev, ...JSON.parse(raw) }));
-    } catch {}
+      if (raw) {
+        setSettings((prev) => ({ ...prev, ...JSON.parse(raw) }));
+      } else {
+        setSettings((prev) => ({ ...prev, ...deviceDefaults() }));
+      }
+    } catch {
+      setSettings((prev) => ({ ...prev, ...deviceDefaults() }));
+    }
   }, []);
 
   useEffect(() => {
@@ -77,87 +93,88 @@ export default function Home() {
     setCustomWords(null);
   }
 
+  const controlProps = {
+    mode, onModeChange: (mode: DisplayMode) => setSettings((s) => ({ ...s, mode })),
+    arabicSize, onArabicSizeChange: (arabicSize: number) => setSettings((s) => ({ ...s, arabicSize })),
+    latinSize, onLatinSizeChange: (latinSize: number) => setSettings((s) => ({ ...s, latinSize })),
+    wordGap, onWordGapChange: (wordGap: number) => setSettings((s) => ({ ...s, wordGap })),
+    latinGap, onLatinGapChange: (latinGap: number) => setSettings((s) => ({ ...s, latinGap })),
+    showAxis, onShowAxisChange: (showAxis: boolean) => setSettings((s) => ({ ...s, showAxis })),
+    showHarakat, onShowHarakatChange: (showHarakat: boolean) => setSettings((s) => ({ ...s, showHarakat })),
+  };
+
   return (
-    <main className="mx-auto flex min-h-dvh max-w-2xl flex-col px-5 py-10 sm:px-8">
-      <header className="mb-10">
-        <p className="font-latin text-[11px] uppercase tracking-widest2 text-gold">
-          Flipped Latin
-        </p>
-        <h1 className="mt-1 font-arabic text-2xl text-paper">
-          مرآة الحروف — a mirrored-reading experiment
-        </h1>
-      </header>
+    <>
+      <main className="mx-auto flex min-h-dvh max-w-2xl flex-col px-5 pt-10 pb-28 sm:px-8">
+        <header className="mb-10">
+          <p className="font-latin text-[11px] uppercase tracking-widest2 text-gold">
+            Flipped Latin
+          </p>
+          <h1 className="mt-1 font-arabic text-2xl text-paper">
+            مرآة الحروف — a mirrored-reading experiment
+          </h1>
+        </header>
 
-      <section className="mb-8 rounded-xl border border-ink-line bg-ink-soft/60 px-5 py-10 sm:px-8">
-        <FlippedText
-          words={activeWords}
-          mode={mode}
-          arabicSize={arabicSize}
-          latinSize={latinSize}
-          wordGap={wordGap}
-          latinGap={latinGap}
-          showAxis={showAxis}
-          showHarakat={showHarakat}
-          onWordChange={handleWordChange}
-        />
+        <section className="mb-8 rounded-xl border border-ink-line bg-ink-soft/60 px-5 py-10 sm:px-8">
+          <FlippedText
+            words={activeWords}
+            mode={mode}
+            arabicSize={arabicSize}
+            latinSize={latinSize}
+            wordGap={wordGap}
+            latinGap={latinGap}
+            showAxis={showAxis}
+            showHarakat={showHarakat}
+            onWordChange={handleWordChange}
+          />
 
-        {!customWords && sentence.english && (
-          <div className="mt-8 flex justify-end">
+          {!customWords && sentence.english && (
+            <div className="mt-8 flex justify-end">
+              <button
+                onClick={() => setShowEnglish((v) => !v)}
+                className="font-latin text-xs uppercase tracking-wide text-paper-dim underline decoration-ink-line underline-offset-4 hover:text-gold"
+              >
+                {showEnglish ? sentence.english : "Reveal English"}
+              </button>
+            </div>
+          )}
+        </section>
+
+        <div className="mb-8 flex flex-wrap justify-end gap-2">
+          {sampleSentences.map((s) => (
             <button
-              onClick={() => setShowEnglish((v) => !v)}
-              className="font-latin text-xs uppercase tracking-wide text-paper-dim underline decoration-ink-line underline-offset-4 hover:text-gold"
+              key={s.id}
+              onClick={() => selectSentence(s.id)}
+              className={[
+                "rounded-full border px-3 py-1.5 font-arabic text-sm transition-colors",
+                s.id === sentenceId
+                  ? "border-gold bg-gold/10 text-gold"
+                  : "border-ink-line text-paper-dim hover:border-gold/50 hover:text-paper",
+              ].join(" ")}
             >
-              {showEnglish ? sentence.english : "Reveal English"}
+              {showHarakat ? s.arabic : stripHarakat(s.arabic)}
             </button>
-          </div>
-        )}
-      </section>
+          ))}
+        </div>
 
-      <div className="mb-8 flex flex-wrap justify-end gap-2">
-        {sampleSentences.map((s) => (
-          <button
-            key={s.id}
-            onClick={() => selectSentence(s.id)}
-            className={[
-              "rounded-full border px-3 py-1.5 font-arabic text-sm transition-colors",
-              s.id === sentenceId
-                ? "border-gold bg-gold/10 text-gold"
-                : "border-ink-line text-paper-dim hover:border-gold/50 hover:text-paper",
-            ].join(" ")}
-          >
-            {showHarakat ? s.arabic : stripHarakat(s.arabic)}
-          </button>
-        ))}
-      </div>
+        <div className="rounded-lg border border-ink-line bg-ink-soft p-4 sm:p-5">
+          <ArabicInput onSubmit={(words) => { setCustomWords(words); setShowEnglish(false); }} />
+        </div>
 
-      <div className="mb-8 rounded-lg border border-ink-line bg-ink-soft p-4 sm:p-5">
-        <ArabicInput onSubmit={(words) => { setCustomWords(words); setShowEnglish(false); }} />
-      </div>
+        <p className="mt-8 font-latin text-xs leading-relaxed text-paper-dim">
+          This is the milestone-one test bed: hard-coded sentences, genuine CSS
+          mirroring (<code className="text-gold">scale-x(-1)</code> on the
+          rendered glyphs, never on the stored string), and live controls for
+          type scale and spacing. Automatic transliteration and flashcards come
+          after this feels right.
+        </p>
+      </main>
 
-      <DisplayControls
-        mode={mode}
-        onModeChange={(mode) => setSettings((s) => ({ ...s, mode }))}
-        arabicSize={arabicSize}
-        onArabicSizeChange={(arabicSize) => setSettings((s) => ({ ...s, arabicSize }))}
-        latinSize={latinSize}
-        onLatinSizeChange={(latinSize) => setSettings((s) => ({ ...s, latinSize }))}
-        wordGap={wordGap}
-        onWordGapChange={(wordGap) => setSettings((s) => ({ ...s, wordGap }))}
-        latinGap={latinGap}
-        onLatinGapChange={(latinGap) => setSettings((s) => ({ ...s, latinGap }))}
-        showAxis={showAxis}
-        onShowAxisChange={(showAxis) => setSettings((s) => ({ ...s, showAxis }))}
-        showHarakat={showHarakat}
-        onShowHarakatChange={(showHarakat) => setSettings((s) => ({ ...s, showHarakat }))}
-      />
+      <FloatingSettingsButton onClick={() => setSheetOpen(true)} />
 
-      <p className="mt-8 font-latin text-xs leading-relaxed text-paper-dim">
-        This is the milestone-one test bed: hard-coded sentences, genuine CSS
-        mirroring (<code className="text-gold">scale-x(-1)</code> on the
-        rendered glyphs, never on the stored string), and live controls for
-        type scale and spacing. Automatic transliteration and flashcards come
-        after this feels right.
-      </p>
-    </main>
+      <SettingsSheet open={sheetOpen} onClose={() => setSheetOpen(false)}>
+        <DisplayControls {...controlProps} />
+      </SettingsSheet>
+    </>
   );
 }

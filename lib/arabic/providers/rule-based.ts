@@ -21,6 +21,14 @@ const CONSONANT: Record<string, string> = {
   "ء": "'",
 };
 
+// Sun letters: the ل of ال assimilates to these — the article renders
+// as A + (consonant) + hyphen and the consonant then appears again in
+// the word body (e.g. الشمس → ASH-SHMS, السوق → AS-SWQ).
+// Moon letters (everything else): article stays AL-.
+const SUN_LETTERS = new Set([
+  "ت", "ث", "د", "ذ", "ر", "ز", "س", "ش", "ص", "ض", "ط", "ظ", "ل", "ن",
+]);
+
 // Matches the definite article in its common forms at word start.
 // Covers bare ال, hamza-bearing alif forms, and lam with sukun (الْ).
 const AL_RE = /^[اأإآ]لْ?/;
@@ -28,14 +36,24 @@ const AL_RE = /^[اأإآ]لْ?/;
 function romanise(word: string): string {
   let out = "";
   let i = 0;
+  // When assimilation is detected we skip the written shadda on the sun
+  // letter — it marks the assimilation in text but we've already handled
+  // it by doubling the consonant in the prefix.
+  let skipNextShadda = false;
 
-  // Definite article: always render as AL- for MVP.
-  // Sun-letter assimilation (AS-SAMAA vs AL-SAMAA) is a phonological
-  // detail that Phase 2 manual correction handles for now.
   const alMatch = word.match(AL_RE);
   if (alMatch) {
-    out = "AL-";
-    i = alMatch[0].length;
+    const afterAl = alMatch[0].length;
+    const firstLetter = word[afterAl] ?? "";
+    if (SUN_LETTERS.has(firstLetter)) {
+      // Sun letter: assimilate — A + consonant + hyphen, then the sun
+      // letter is output again normally in the main loop below.
+      out = "A" + (CONSONANT[firstLetter] ?? firstLetter) + "-";
+      skipNextShadda = true;
+    } else {
+      out = "AL-";
+    }
+    i = afterAl;
   }
 
   while (i < word.length) {
@@ -62,6 +80,7 @@ function romanise(word: string): string {
       case "ْ": break;              // sukun — no vowel
       case "ٰ": out += "A"; break;  // dagger alef (superscript alef)
       case "ّ": {                   // shadda — double the preceding consonant cluster
+        if (skipNextShadda) { skipNextShadda = false; break; }
         const m = out.match(/([A-Z']+)$/);
         if (m) out += m[1];
         break;
@@ -69,10 +88,12 @@ function romanise(word: string): string {
 
       // ── Alif forms ───────────────────────────────────────────────
       case "ا":
-        // In the middle of a word with harakat, bare alif is consumed
-        // as a long-vowel extension by the fatha case above.
-        // At word start (or after AL-), it's a hamza seat → A.
-        if (out === "" || out === "AL-") out += "A";
+        // Bare alif at logical word-start (no output yet, or just the
+        // article prefix). out.endsWith("-") covers AL-, AS-, ASH-, etc.
+        // Mid-word bare alif without a preceding harakat is ambiguous
+        // (long vowel vs hamza seat) — skip it; the fatha/damma/kasra
+        // cases handle the unambiguous long-vowel combinations above.
+        if (out === "" || out.endsWith("-")) out += "A";
         break;
       case "أ": out += "A";  break;
       case "إ": out += "I";  break;
