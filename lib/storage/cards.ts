@@ -21,6 +21,13 @@ export function getCards(): FlashCard[] {
   return readAll();
 }
 
+// crypto.randomUUID() needs a secure context (HTTPS or localhost) — this
+// app is also used over plain HTTP on the local network (phone testing),
+// where it's undefined, so generate the id without it.
+function generateId(): string {
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
 // No-op if a card with this Arabic text is already saved.
 export function saveCard(word: WordEntry): FlashCard[] {
   const cards = readAll();
@@ -28,7 +35,7 @@ export function saveCard(word: WordEntry): FlashCard[] {
 
   const next = [
     ...cards,
-    { ...word, id: crypto.randomUUID(), createdAt: new Date().toISOString() },
+    { ...word, id: generateId(), createdAt: new Date().toISOString() },
   ];
   writeAll(next);
   return next;
