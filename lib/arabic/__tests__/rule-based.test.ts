@@ -48,6 +48,29 @@ describe("sun letters — ال assimilates", () => {
   });
 });
 
+// ── Sun-letter assimilation with harakat — internal vowels must survive ──────
+//
+// The doubled consonant from assimilation must still pick up whatever vowel
+// follows it in the source text; skipNextShadda should only swallow the
+// shadda mark itself, never the harakat that comes after it.
+
+describe("sun letters with harakat — internal vowel is preserved", () => {
+  it("shin (ش): الشَّمْس → ASH-SHAMS", async () => {
+    const [w] = await trans("الشَّمْس");
+    expect(w).toBe("ASH-SHAMS");
+  });
+
+  it("ra (ر): الرَّجُل → AR-RAJUL", async () => {
+    const [w] = await trans("الرَّجُل");
+    expect(w).toBe("AR-RAJUL");
+  });
+
+  it("dal (د): الدَّار → AD-DAR", async () => {
+    const [w] = await trans("الدَّار");
+    expect(w).toBe("AD-DAR");
+  });
+});
+
 // ── Moon letters — AL- stays ─────────────────────────────────────────────────
 
 describe("moon letters — ال stays as AL-", () => {
