@@ -38,4 +38,8 @@ export const starterWords: WordEntry[] = [
   { arabic: "إِلَى", latin: "ILA", english: "to" },
   { arabic: "نَعَم", latin: "NA'AM", english: "yes" },
   { arabic: "لَا", latin: "LAA", english: "no" },
+
+  // Lesson notes, 3 Oct 2026: introductions
+  { arabic: "تَشَرَّفْنَا", latin: "TASHARRAFNAA", english: "pleased to meet you" },
+  { arabic: "أَيْضًا", latin: "AYDAN", english: "also / too" },
 ];

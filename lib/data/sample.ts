@@ -90,4 +90,34 @@ export const sampleSentences: ArabicSentence[] = [
       { arabic: "وَجَمِيلٌ", latin: "WA-JAMEEL" },
     ],
   },
+
+  // Lesson notes, 3 Oct 2026: introductions.
+  {
+    id: "lesson-intro-name",
+    arabic: "مَا اسْمُكَ؟",
+    english: "What is your name?",
+    words: [
+      { arabic: "مَا", latin: "MAA" },
+      { arabic: "اسْمُكَ؟", latin: "ISMUKA" },
+    ],
+  },
+  {
+    id: "lesson-intro-from",
+    arabic: "مِنْ أَيْنَ أَنْتَ؟",
+    english: "Where are you from?",
+    words: [
+      { arabic: "مِنْ", latin: "MIN" },
+      { arabic: "أَيْنَ", latin: "AYNA" },
+      { arabic: "أَنْتَ؟", latin: "ANTA" },
+    ],
+  },
+  {
+    id: "lesson-intro-job",
+    arabic: "مَاذَا تَعْمَلُ؟",
+    english: "What do you do?",
+    words: [
+      { arabic: "مَاذَا", latin: "MAATHAA" },
+      { arabic: "تَعْمَلُ؟", latin: "TA'MAL" },
+    ],
+  },
 ];
