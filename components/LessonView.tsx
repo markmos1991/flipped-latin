@@ -4,12 +4,11 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getCards, saveCard, saveCards } from "@/lib/storage/cards";
 import { stripHarakat } from "@/lib/arabic/harakat";
-import { formatLessonDate, itemLatin, itemToWordEntry } from "@/lib/lessons";
+import { formatLessonDate, itemToWordEntry } from "@/lib/lessons";
 import { useDisplaySettings, displayControlProps } from "@/lib/settings";
 import DisplayControls from "@/components/DisplayControls";
 import FloatingSettingsButton from "@/components/FloatingSettingsButton";
 import SettingsSheet from "@/components/SettingsSheet";
-import { DisplayMode } from "@/types/arabic";
 import { Lesson, LessonItem } from "@/types/lesson";
 
 type ItemProps = {
@@ -17,12 +16,12 @@ type ItemProps = {
   inDeck: boolean;
   onAdd: (item: LessonItem) => void;
   arabicText: (a: string) => string;
-  mode: DisplayMode;
   compact?: boolean;
 };
 
-function LessonItemRow({ item, inDeck, onAdd, arabicText, mode, compact }: ItemProps) {
-  const latin = itemLatin(item);
+// Arabic first, English as supporting text. Transliteration is
+// deliberately not shown here — it's only stored for the flashcards.
+function LessonItemRow({ item, inDeck, onAdd, arabicText, compact }: ItemProps) {
   return (
     <li className="flex items-start gap-3 border-b border-ink-line/70 py-3 last:border-b-0">
       <button
@@ -51,7 +50,7 @@ function LessonItemRow({ item, inDeck, onAdd, arabicText, mode, compact }: ItemP
 
       <div className="flex min-w-0 flex-1 flex-col-reverse gap-1 sm:flex-row sm:items-center sm:gap-3">
         <div className="min-w-0 flex-1">
-          <p className="font-latin text-sm text-paper">
+          <p className="font-latin text-sm text-paper-dim">
             {item.english}
             {item.note && (
               <span className="ml-2 inline-block whitespace-nowrap rounded-full border border-ink-line px-2 py-0.5 text-[11px] text-paper-dim">
@@ -59,19 +58,14 @@ function LessonItemRow({ item, inDeck, onAdd, arabicText, mode, compact }: ItemP
               </span>
             )}
           </p>
-          {mode !== "arabic" && (
-            <p className="mt-1 font-latin text-[11px] tracking-wide text-gold-soft">
-              <span className={mode === "flipped" ? "inline-block -scale-x-100" : undefined}>{latin}</span>
-            </p>
-          )}
         </div>
 
         <p
           dir="rtl"
           lang="ar"
           className={[
-            "text-right font-arabic leading-relaxed text-paper sm:max-w-[60%] sm:shrink-0",
-            compact ? "text-xl" : "text-2xl sm:text-3xl",
+            "text-right font-arabic leading-loose text-paper sm:max-w-[60%] sm:shrink-0",
+            compact ? "text-2xl" : "text-3xl sm:text-4xl",
           ].join(" ")}
         >
           {arabicText(item.arabic)}
@@ -131,7 +125,6 @@ export default function LessonView({ lesson }: { lesson: Lesson }) {
       inDeck={savedArabic.has(item.arabic)}
       onAdd={handleAdd}
       arabicText={arabicText}
-      mode={settings.mode}
       compact={compact}
     />
   );
@@ -226,9 +219,9 @@ export default function LessonView({ lesson }: { lesson: Lesson }) {
 
         {lesson.personal.length > 0 && (
           <section className="mb-10">
-            <SectionHeader label="About me" items={lesson.personal} savedArabic={savedArabic} onAddAll={handleAddAll} />
+            <SectionHeader label="Personal sentences" items={lesson.personal} savedArabic={savedArabic} onAddAll={handleAddAll} />
             <p className="mb-3 font-latin text-xs text-paper-dim">
-              Personal sentences: things I actually say about myself.
+              About me — practise saying these out loud.
             </p>
             <ul className="rounded-lg border border-gold/50 bg-gold/10 px-4">
               {lesson.personal.map((item, i) => row(item, i))}
@@ -236,14 +229,6 @@ export default function LessonView({ lesson }: { lesson: Lesson }) {
           </section>
         )}
 
-        {lesson.roughNotes && (
-          <details className="rounded-lg border border-ink-line bg-ink-soft/60 px-4 py-3">
-            <summary className="cursor-pointer font-latin text-[11px] uppercase tracking-widest2 text-paper-dim">
-              Rough notes from the lesson
-            </summary>
-            <pre className="mt-3 whitespace-pre-wrap font-latin text-sm text-paper-dim">{lesson.roughNotes}</pre>
-          </details>
-        )}
       </main>
 
       <FloatingSettingsButton onClick={() => setSheetOpen(true)} />

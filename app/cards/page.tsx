@@ -101,7 +101,7 @@ export default function CardsPage() {
                       href={`/lessons/${c.lessonId}`}
                       className="rounded-full border border-ink-line px-2 py-0.5 font-latin text-[10px] uppercase tracking-wide text-gold-soft hover:text-gold"
                     >
-                      Lesson · {lessonDates.get(c.lessonId)}
+                      Source: Lesson — {lessonDates.get(c.lessonId)}
                     </Link>
                   )}
                 </div>

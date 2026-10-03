@@ -33,11 +33,9 @@ export type Lesson = {
   id: string;
   date: string; // YYYY-MM-DD
   title?: string;
-  // The rough in-lesson notes (usually approximate Latin), kept for reference.
-  roughNotes?: string;
   vocabulary: LessonGroup[];
   grammar: GrammarPoint[];
   sentences: LessonItem[];
-  // Sentences about me — shown apart from generic vocabulary.
+  // Sentences about me to practise saying — shown apart from generic vocabulary.
   personal: LessonItem[];
 };
