@@ -78,7 +78,7 @@ export const sampleSentences: ArabicSentence[] = [
     ],
   },
 
-  // Tashkeel density stress test — checks Amiri renders dense harakat
+  // Tashkeel density stress test — checks the Arabic font renders dense harakat
   // without clipping or colliding with the Latin annotation below.
   {
     id: "tashkeel",

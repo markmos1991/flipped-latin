@@ -25,6 +25,8 @@ export type WordEntry = {
 export type FlashCard = WordEntry & {
   id: string;
   createdAt: string;
+  // Set when the card was added from a lesson page (lib/data/lessons.ts).
+  lessonId?: string;
 };
 
 export type DisplayMode = "arabic" | "flipped" | "normal";

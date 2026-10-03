@@ -5,11 +5,14 @@ import Link from "next/link";
 import { starterWords } from "@/lib/data/starter-words";
 import { getCards, saveCard, deleteCard } from "@/lib/storage/cards";
 import { stripHarakat } from "@/lib/arabic/harakat";
+import { allLessons, formatLessonDate } from "@/lib/lessons";
 import { useDisplaySettings, displayControlProps } from "@/lib/settings";
 import DisplayControls from "@/components/DisplayControls";
 import FloatingSettingsButton from "@/components/FloatingSettingsButton";
 import SettingsSheet from "@/components/SettingsSheet";
 import { FlashCard, WordEntry } from "@/types/arabic";
+
+const lessonDates = new Map(allLessons().map((l) => [l.id, formatLessonDate(l.date)]));
 
 export default function CardsPage() {
   const [cards, setCards] = useState<FlashCard[] | null>(null);
@@ -47,12 +50,20 @@ export default function CardsPage() {
             بِطَاقَات — your word deck
           </h1>
         </div>
-        <Link
-          href="/"
-          className="mt-1 font-latin text-xs uppercase tracking-wide text-paper-dim underline decoration-ink-line underline-offset-4 hover:text-gold"
-        >
-          ← Renderer
-        </Link>
+        <nav className="mt-1 flex flex-col items-end gap-1 font-latin text-xs uppercase tracking-wide">
+          <Link
+            href="/"
+            className="text-paper-dim underline decoration-ink-line underline-offset-4 hover:text-gold"
+          >
+            ← Renderer
+          </Link>
+          <Link
+            href="/lessons"
+            className="text-paper-dim underline decoration-ink-line underline-offset-4 hover:text-gold"
+          >
+            Lessons →
+          </Link>
+        </nav>
       </header>
 
       {/* Your deck */}
@@ -82,9 +93,17 @@ export default function CardsPage() {
                 key={c.id}
                 className="flex items-center justify-between rounded-lg border border-ink-line bg-ink-soft px-4 py-3"
               >
-                <div className="flex items-baseline gap-3">
+                <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                   <span className="font-arabic text-lg text-paper">{arabicText(c.arabic)}</span>
                   <span className="font-latin text-xs text-paper-dim">{c.english}</span>
+                  {c.lessonId && lessonDates.has(c.lessonId) && (
+                    <Link
+                      href={`/lessons/${c.lessonId}`}
+                      className="rounded-full border border-ink-line px-2 py-0.5 font-latin text-[10px] uppercase tracking-wide text-gold-soft hover:text-gold"
+                    >
+                      Source: Lesson — {lessonDates.get(c.lessonId)}
+                    </Link>
+                  )}
                 </div>
                 <button
                   onClick={() => handleDelete(c.id)}

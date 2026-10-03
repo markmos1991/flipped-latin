@@ -116,6 +116,12 @@ function romanise(word: string): string {
     .trim();
 }
 
+// Synchronous whole-phrase helper for static data that has no
+// hand-written Latin (see lib/lessons.ts).
+export function romaniseText(arabic: string): string {
+  return tokenize(arabic).map(romanise).filter(Boolean).join(" ");
+}
+
 export class RuleBasedTransliterator implements Transliterator {
   async analyse(arabic: string): Promise<AnalysedWord[]> {
     return tokenize(arabic).map((surface) => ({

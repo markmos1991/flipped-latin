@@ -70,12 +70,20 @@ export default function Home() {
               مرآة الحروف — a mirrored-reading experiment
             </h1>
           </div>
-          <Link
-            href="/cards"
-            className="mt-1 font-latin text-xs uppercase tracking-wide text-paper-dim underline decoration-ink-line underline-offset-4 hover:text-gold"
-          >
-            Flashcards →
-          </Link>
+          <nav className="mt-1 flex flex-col items-end gap-1 font-latin text-xs uppercase tracking-wide">
+            <Link
+              href="/lessons"
+              className="text-paper-dim underline decoration-ink-line underline-offset-4 hover:text-gold"
+            >
+              Lessons →
+            </Link>
+            <Link
+              href="/cards"
+              className="text-paper-dim underline decoration-ink-line underline-offset-4 hover:text-gold"
+            >
+              Flashcards →
+            </Link>
+          </nav>
         </header>
 
         <section className="mb-8 rounded-xl border border-ink-line bg-ink-soft/60 px-5 py-10 sm:px-8">
