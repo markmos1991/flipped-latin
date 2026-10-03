@@ -83,7 +83,7 @@ Run tests with `npm run test` (Vitest).
 
 ## Design notes
 
-- Arabic is set in Amiri (a naskh-style serif chosen for reading clarity,
+- Arabic is set in Noto Naskh Arabic (a screen-oriented naskh face chosen for reading clarity,
   not decoration); Latin is set in Space Grotesk, chosen because its
   uppercase letterforms — Q, A, W in particular — stay distinct after a
   horizontal flip, which is the thing the whole project depends on.

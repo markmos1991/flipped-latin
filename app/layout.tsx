@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import { Amiri, Space_Grotesk } from "next/font/google";
+import { Noto_Naskh_Arabic, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
-// Amiri: a classical naskh-style Arabic serif, chosen for clarity at
-// reading size rather than a decorative display face.
-const amiri = Amiri({
+// Noto Naskh Arabic: a naskh face drawn for screens. Lighter strokes and
+// open counters (ق ف و م stay readable at small sizes on the dark
+// background) — Amiri, used before, read as too heavy.
+const arabicFont = Noto_Naskh_Arabic({
   subsets: ["arabic"],
   weight: ["400", "700"],
   variable: "--font-arabic",
@@ -34,7 +35,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${amiri.variable} ${spaceGrotesk.variable}`}>
+    <html lang="en" className={`${arabicFont.variable} ${spaceGrotesk.variable}`}>
       <body>{children}</body>
     </html>
   );
