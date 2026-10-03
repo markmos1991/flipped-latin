@@ -29,14 +29,29 @@ function generateId(): string {
 }
 
 // No-op if a card with this Arabic text is already saved.
-export function saveCard(word: WordEntry): FlashCard[] {
-  const cards = readAll();
-  if (cards.some((c) => c.arabic === word.arabic)) return cards;
+export function saveCard(word: WordEntry, lessonId?: string): FlashCard[] {
+  return saveCards([word], lessonId);
+}
 
-  const next = [
-    ...cards,
-    { ...word, id: generateId(), createdAt: new Date().toISOString() },
-  ];
+// Batch version of saveCard — one read/write for "add all" buttons.
+export function saveCards(words: WordEntry[], lessonId?: string): FlashCard[] {
+  const cards = readAll();
+  const saved = new Set(cards.map((c) => c.arabic));
+  const createdAt = new Date().toISOString();
+  const added: FlashCard[] = [];
+  for (const word of words) {
+    if (saved.has(word.arabic)) continue;
+    saved.add(word.arabic);
+    added.push({
+      ...word,
+      id: generateId(),
+      createdAt,
+      ...(lessonId ? { lessonId } : {}),
+    });
+  }
+  if (added.length === 0) return cards;
+
+  const next = [...cards, ...added];
   writeAll(next);
   return next;
 }

@@ -41,6 +41,11 @@ correction are all working. What's here:
 - **Persistence** — display settings are saved to `localStorage`
   (`app/page.tsx`), with device-width-aware defaults (phone / tablet /
   desktop) applied only on first visit before any settings are saved.
+- **Lesson notes** (`/lessons`) — a dated record of each tutor lesson:
+  vocabulary and phrases, grammar patterns (each in its own card),
+  useful sentences, and personal "about me" sentences. Every item can be
+  added to the flashcard deck individually or per section; cards added
+  this way link back to their lesson.
 
 What's *not* here yet: a Claude-backed transliteration provider (richer
 accuracy, plus lemma/root — see below), and flashcards.
@@ -71,6 +76,10 @@ Run tests with `npm run test` (Vitest).
   ready; nothing else in the app needs to change.
 - `lib/data/sample.ts` — edit or extend this directly to throw more test
   sentences at the renderer.
+- `lib/data/lessons.ts` — lesson notes. To add a lesson, append a new
+  `Lesson` (shape in `types/lesson.ts`) with fully vowelled Arabic. `latin`
+  is optional per item; without it the rule-based transliterator fills in
+  a rougher version. Empty sections are hidden.
 
 ## Design notes
 
