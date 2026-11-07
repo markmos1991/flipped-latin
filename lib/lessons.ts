@@ -40,6 +40,7 @@ export function itemToWordEntry(item: LessonItem): WordEntry {
 export function lessonItems(lesson: Lesson): LessonItem[] {
   return [
     ...lesson.vocabulary.flatMap((g) => g.items),
+    ...(lesson.verbs ?? []).flatMap((v) => [...v.conjugations, ...(v.examples ?? [])]),
     ...lesson.grammar.flatMap((g) => [...(g.forms ?? []), ...(g.examples ?? [])]),
     ...lesson.sentences,
     ...lesson.personal,
