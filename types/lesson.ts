@@ -29,10 +29,37 @@ export type GrammarPoint = {
   examples?: LessonItem[];
 };
 
+// A verb in the lesson's verb library: past-tense root, present-tense
+// form, and its present-tense conjugations. Each conjugation's `note`
+// names the person ("I", "We", "He", "She") and drives the table rows,
+// so new persons can be added later without changing the type.
+export type Verb = {
+  english: string; // infinitive, e.g. "To travel"
+  past: LessonItem; // past-tense root, e.g. سَافَرَ
+  present: LessonItem; // present-tense form, e.g. يُسَافِرُ
+  conjugations: (LessonItem & { person: string })[];
+  examples?: LessonItem[];
+};
+
+// One line of the pronunciation guide: a transliteration symbol, the
+// Arabic letter or mark it stands for, and how to say it.
+export type PronunciationNote = {
+  symbol: string;
+  arabic?: string;
+  sound: string;
+  example?: string;
+};
+
 export type Lesson = {
   id: string;
+  number?: number;
   date: string; // YYYY-MM-DD
   title?: string;
+  // Show the transliteration on the lesson page (from lesson 2 on, at
+  // Mark's request). Lessons without it keep Arabic + English only.
+  showTransliteration?: boolean;
+  pronunciation?: PronunciationNote[];
+  verbs?: Verb[];
   vocabulary: LessonGroup[];
   grammar: GrammarPoint[];
   sentences: LessonItem[];

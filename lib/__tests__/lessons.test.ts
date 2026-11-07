@@ -21,6 +21,22 @@ describe("lesson data", () => {
       }
     }
   });
+
+  it("every verb has a conjugation for each person, with hand-written Latin", () => {
+    for (const l of lessons) {
+      for (const v of l.verbs ?? []) {
+        expect(v.conjugations.map((c) => c.person)).toEqual(["I", "We", "He", "She"]);
+        for (const c of v.conjugations) expect(c.latin).toBeTruthy();
+      }
+    }
+  });
+
+  it("includes verb conjugations and examples in a lesson's flashcard items", () => {
+    const l2 = lessons.find((l) => l.number === 2)!;
+    const arabic = lessonItems(l2).map((i) => i.arabic);
+    expect(arabic).toContain("أُسَافِرُ");
+    expect(arabic).toContain("هِيَ تَذْهَبُ إِلَى الْجَمْعِيَّةِ كُلَّ أُسْبُوعٍ");
+  });
 });
 
 describe("lesson helpers", () => {
