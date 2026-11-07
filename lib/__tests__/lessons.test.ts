@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { lessons } from "@/lib/data/lessons";
-import { allLessons, formatLessonDate, itemLatin, itemToWordEntry, lessonItems } from "@/lib/lessons";
+import { allLessons, formatLessonDate, itemLatin, itemToWordEntry, lessonItems, lessonKeyWords } from "@/lib/lessons";
 
 describe("lesson data", () => {
   it("has unique ids and valid YYYY-MM-DD dates", () => {
@@ -57,5 +57,23 @@ describe("lesson helpers", () => {
     expect(
       itemToWordEntry({ arabic: "مَا اسْمُكِ؟", latin: "MAA ISMUKI", english: "What is your name?", note: "to a female" }),
     ).toEqual({ arabic: "مَا اسْمُكِ؟", latin: "MAA ISMUKI", english: "What is your name? (to a female)" });
+  });
+});
+
+describe("lessonKeyWords", () => {
+  it("keeps one card per verb, using the past-tense root", () => {
+    const l2 = lessons.find((l) => l.number === 2)!;
+    const verbs = lessonKeyWords(l2).find((g) => g.heading === "Verbs")!;
+    expect(verbs.words.map((w) => w.arabic)).toEqual(["سَافَرَ", "ذَهَبَ", "تَعَلَّمَ", "دَرَّسَ", "اِشْتَرَى"]);
+    expect(verbs.words[0]).toEqual({ arabic: "سَافَرَ", latin: "Sāfara", english: "to travel" });
+    const all = lessonKeyWords(l2).flatMap((g) => g.words.map((w) => w.arabic));
+    expect(all).not.toContain("أُسَافِرُ");
+  });
+
+  it("includes every vocabulary group", () => {
+    for (const l of lessons) {
+      const headings = lessonKeyWords(l).map((g) => g.heading);
+      for (const g of l.vocabulary) expect(headings).toContain(g.heading);
+    }
   });
 });
